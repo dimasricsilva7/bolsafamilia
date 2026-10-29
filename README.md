@@ -21,16 +21,23 @@ pnpm test
 pnpm build
 ```
 
+## Painel administrativo e dados locais
+
+O painel `/admin/login` exige `ADMIN_PASSWORD` e `ADMIN_SESSION_SECRET` configurados como segredos privados no ambiente. A lista administrativa é salva somente no `localStorage` do navegador do admin e pode ser exportada em CSV ou JSON. Ela não sincroniza entre dispositivos nem recebe respostas de visitantes; limpe o armazenamento do navegador apenas depois de exportar o que precisa manter. Não registre CPF, dados bancários, senhas ou outras informações sensíveis. Veja [`docs/LOCAL_ADMIN_STORAGE.md`](docs/LOCAL_ADMIN_STORAGE.md).
+
 ## Estrutura
 
-- `src/app/`: páginas do App Router (`/`, `/quiz`, `/resultado`, `/privacidade` e `/termos`).
+- `src/app/`: páginas públicas, `/admin/login`, `/admin`, `/admin/configuracoes` e `/admin/pagamentos`.
 - `src/components/QuizFlow.tsx`: perguntas, progresso, navegação e processamento transparente.
+- `src/components/admin/RecordsDashboard.tsx`: lista no navegador autenticado e exportação CSV/JSON.
 - `src/lib/quiz.ts`: opções, validação e leitura segura das respostas.
+- `src/lib/admin-auth.ts`: sessão administrativa assinada no servidor.
+- `src/lib/admin-local-store.ts`: validação e exportação dos registros do navegador.
 - `src/lib/meta-tracking.ts`: gerenciador central dos quatro Pixels, consentimento, allowlist de eventos e deduplicação do navegador.
 - `.env.example`: nomes e valores públicos de exemplo; não contém credenciais.
 - `docs/INTEGRACOES.md`: decisões, referência Bravo Pay, configuração de Pixels e pendências de ativação.
 
-As respostas são guardadas somente no `sessionStorage` do navegador para exibir o resumo. Não são transmitidas ao servidor nem aos Pixels. Não há banco de dados porque esta versão não persiste cadastro, pedido ou pagamento.
+As respostas são guardadas somente no `sessionStorage` do navegador do visitante para exibir seu resumo. Não são transmitidas ao servidor nem aos Pixels. Os registros inseridos no painel são separados e existem somente no navegador administrativo. Não há banco de dados nem persistência central.
 
 ## Pixels e consentimento
 
@@ -44,7 +51,7 @@ O projeto não contém endpoint de cobrança ou webhook ativo. Não há produto,
 
 ## Publicação no Vercel
 
-O projeto está preparado como aplicação Next.js. Para publicar, importe `dimasricsilva7/bolsafamilia` no Vercel e configure primeiro apenas as variáveis necessárias. Os quatro Pixels devem permanecer desligados até confirmar, para cada conta, autorização de uso no domínio e consentimento correspondente. Não configure credenciais de pagamento/CAPI ainda. Nenhuma publicação foi realizada nesta tarefa.
+O código será entregue em uma branch isolada `manus/admin-local-storage` do repositório original; importe essa branch no seu projeto Vercel depois que ela estiver disponível no GitHub. Defina `ADMIN_PASSWORD` e `ADMIN_SESSION_SECRET` como segredos privados da Vercel (segredo de sessão com pelo menos 32 caracteres). Os quatro Pixels devem permanecer desligados até confirmar, para cada conta, autorização de uso no domínio e consentimento correspondente. Não configure credenciais de pagamento/CAPI. Nenhum deploy será feito por esta tarefa.
 
 ## Fontes
 
